@@ -1,0 +1,31 @@
+{
+  "name": "Sec-Blog",
+  "version": "0.0.0",
+  "server": false,
+  "private": true,
+  "scripts": {
+    "start": "node ./bin/www",
+    "serve": "turbo devserver",
+    "test": "",
+    "build": "",
+    "postinstall": "turbo postinstall",
+    "reset": "rimraf ./tmp/*"
+  },
+  "dependencies": {
+    "turbo360": "^1.8.68",
+    "vertex360": "^0.29.9",
+    "express": "^4.17.1",
+    "parseurl": "^1.3.2",
+    "send": "0.16.2",
+    "serve-static": "1.13.2",
+    "statuses": "^1.4.0",
+    "utils-merge": "1.0.1",
+    "vary": "^1.1.2"
+  },
+  "devDependencies": {
+    "nodemon": "^2.0.2",
+    "rimraf": "^2.6.2"
+  },
+  "format": "vertex",
+  "vtx-template": "portfolio"
+}
