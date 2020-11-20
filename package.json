@@ -13,7 +13,12 @@
   "author": " (James)",
   "license": "ISC",
   "dependencies": {
+    "ejs": "^3.1.5",
     "express": "^4.17.1",
-    "hbs": "^4.1.1"
+    "hbs": "^4.1.1",
+    "mammoth": "^1.4.14",
+    "method-override": "^3.0.0",
+    "mongoose": "^5.10.15",
+    "nodemon": "^2.0.6"
   }
 }
