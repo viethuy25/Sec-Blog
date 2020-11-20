@@ -1,0 +1,93 @@
+<% layout('/layouts/boilerplate')%>
+
+<h1>WELCOME TO NEWBIE ZONE</h1>
+
+  <main>
+      <div class="container">
+          <section class="main_container">
+              <div class="card mb-4">
+                  <img class="card-img-top" src="https://placeimg.com/750/300/tech" alt="Card image cap">
+                  <div class="card-body">
+                      <h2 class="card-title"><%= posts.reverse()[0].title %></h2>
+                      <p class="card-text"><%= posts[0].description %></p>
+                      <a href="/Posts/<%= posts[0]._id %>" class="btn btn-primary">Read More &rarr;</a>
+                  </div>
+                  <div class="card-footer text-muted">
+                      Posted on <%= posts[0]._date %> by <%= posts[0].author %>
+                  </div>
+              </div>
+
+              <div class="posts">
+                <% for (let post of posts) {%>
+                  <div class="row justify-content-center">
+                      <div class="col-lg-7" style="margin-top: 50px;">
+                          <div class="card">
+
+                              <img src="https://placeimg.com/500/500/tech"
+                                  class="card-img-top" alt="...">
+                              <div class="card-body">
+                                  <h4 class="card-title"><a href="/Posts/<%= post._id %>"> <%= post.title %> </a>
+                                    <h5>Posted by <%= post.author %></h5>
+                                  </h4>
+                                  <p class="card-text">
+                                    <small class="text-muted"><%= post.date %></small>
+                                  </p>
+                                  <p class="card-text"><%= post.description %></p>
+                                  <a href="/Posts/<%= post._id %>" class="btn btn-primary">Read More &rarr;</a>
+                              </div>
+                          </div>
+                      </div>
+                  </div>
+                  <% } %>
+              </div>
+          </section>
+
+          <section class="sidebar">
+              <nav class="collapse bd-links" id="bd-docs-nav" aria-label="Main navigation">
+                  <div class="bd-toc-item active">
+                      <a class="bd-toc-link" href="/docs/4.5/getting-started/introduction/">
+                        Getting started
+                      </a>
+                
+                      <ul class="nav bd-sidenav"><li class="active bd-sidenav-active">
+                            <a href="/docs/4.5/getting-started/introduction/">
+                              Introduction
+                            </a>
+                          </li><li>
+                            <a href="/docs/4.5/getting-started/download/">
+                              Download
+                            </a>
+                          </li><li>
+                            <a href="/docs/4.5/getting-started/contents/">
+                              Contents
+                            </a>
+                          </li><li>
+                            <a href="/docs/4.5/getting-started/browsers-devices/">
+                              Browsers &amp; devices
+                            </a>
+                          </li><li>
+                            <a href="/docs/4.5/getting-started/javascript/">
+                              JavaScript
+                            </a>
+                          </li><li>
+                            <a href="/docs/4.5/getting-started/theming/">
+                              Theming
+                            </a>
+                          </li><li>
+                            <a href="/docs/4.5/getting-started/build-tools/">
+                              Build tools
+                            </a>
+                          </li><li>
+                            <a href="/docs/4.5/getting-started/webpack/">
+                              Webpack
+                            </a>
+                          </li><li>
+                            <a href="/docs/4.5/getting-started/accessibility/">
+                              Accessibility
+                            </a>
+                          </li></ul>
+                    </div>
+              </nav>
+          </section>
+      </div>
+  </main>

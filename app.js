@@ -1,6 +1,8 @@
 const express = require('express');
 const path = require('path');
 const mongoose = require('mongoose');
+const ejsMate = require('ejs-mate');
+
 const methodOverride = require('method-override');
 const BlogPost = require('./models/blogpost');
 
@@ -18,6 +20,7 @@ db.once("open", () => {
 
 const app = express();
 
+app.engine('ejs', ejsMate)
 app.set('view engine', 'ejs');
 app.set('views', path.join(__dirname, 'views'));
 
@@ -32,12 +35,12 @@ app.get('/',(req,res)=>{
 //view all posts
 app.get('/Posts', async(req,res)=>{
     const posts = await BlogPost.find({});
-    res.render('partials/posts', { posts })
+    res.render('posts/posts', { posts });
 });
 
 //new post page
 app.get('/Posts/create',(req,res) => {
-    res.render('partials/create');
+    res.render('posts/create');
 });
 
 //public new post
@@ -55,13 +58,13 @@ app.post('/Posts', async(req,res)=>{
 //view specific post page
 app.get('/Posts/:id', async(req,res)=>{
     const post = await BlogPost.findById(req.params.id);
-    res.render('partials/show', { post });
+    res.render('posts/show', { post });
 });
 
 //edit post
 app.get('/Posts/:id/edit', async(req,res)=>{
     const post = await BlogPost.findById(req.params.id);
-    res.render('partials/edit', { post });
+    res.render('posts/edit', { post });
 });
 
 app.put('/Posts/:id', async(req,res) => {
@@ -76,6 +79,21 @@ app.put('/Posts/:id', async(req,res) => {
     res.redirect('/Posts')
 })
 
+//delete post
+app.get('/Posts/:id/delete', async(req,res)=>{
+    const post = await BlogPost.findById(req.params.id);
+    res.render('posts/delete', { post });
+});
+
+app.delete('/Posts/:id', async(req,res) => {
+    try {
+        const { id } = req.params;
+        await BlogPost.findByIdAndDelete(id);
+    } catch (error) {
+        console.log(error);
+    }
+    res.redirect('/Posts');
+})
 
 app.listen(3000, () => {
     console.log('Serving on port 3000')
