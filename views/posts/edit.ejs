@@ -3,28 +3,24 @@
 <div class="row">
     <div class="col-6 offset-3">
         <h1 class="text-center">New Post</h1>
-        <form action="/Posts/<%= post._id %>?_method=PUT" method="POST">
+        <form action="/Posts/<%= post._id %>?_method=PUT" method="POST" class="needs-validation" novalidate>
             <div class='mb-3'>
                 <label class="form-label" for="title">Title</label>
-                <input class="form-control" type="text" id="title" name="post[title]" value="<%= post.title %>">
+                <input class="form-control" type="text" id="title" name="post[title]" value="<%= post.title %>" required>
             </div>
             <div class='mb-3'>
                 <label class="form-label" for="author">Author</label>
-                <input class="form-control" type="text" id="author" name="post[author]" value="<%= post.author %>">
+                <input class="form-control" type="text" id="author" name="post[author]" value="<%= post.author %>" required>
             </div>
             <div class='mb-3'>
                 <label class="form-label" for="description">Description</label>
-                <textarea class="form-control" type="text" id="description" name="post[description]"><%= post.description %></textarea>
-            </div>
-            <div class='mb-3'>
-                <label class="form-label" for="author">Date</label>
-                <input class="form-control" type="text" id="date" name="post[date]" value="<%= post.date %>">
+                <textarea class="form-control" type="text" id="description" name="post[description]" required><%= post.description %></textarea>
             </div>
             <div class='mb-3'>
                 <label class="form-label" for="image">Image URL</label>
-                <input class="form-control" type="text" id="image" name="post[image]" value="<%= post.image %>">
+                <input class="form-control" type="text" id="image" name="post[image]" value="<%= post.image %>" required>
             </div>
-            <button>Edit Post</button>
+            <button type="submit">Edit Post</button>
         </form>
         <a href='/Posts/<%= post._id %>'>All posts </a>
     </div>
