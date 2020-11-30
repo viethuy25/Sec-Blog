@@ -1,6 +1,7 @@
 const express = require('express');
 const router = express.Router();
 const {BlogPostSchemaJoi} = require('../models/blogPostJoi');
+const {isLoggedIn} = require('../middleware')
 
 const catchAsync = require('../utils/catchAsync');
 const ExpressError = require('../utils/ExpressError');
@@ -24,12 +25,12 @@ router.get('/', catchAsync(async(req,res)=>{
 }));
 
 //new post page
-router.get('/create',(req,res) => {
+router.get('/create', isLoggedIn, (req,res) => {
     res.render('posts/create');
 });
 
 //publish new post
-router.post('/', validateBlogPost, catchAsync(async(req,res ,next)=>{
+router.post('/', isLoggedIn, validateBlogPost, catchAsync(async(req,res ,next)=>{
     const post = new BlogPost(req.body.post);
     await post.save();
     req.flash('success', 'Successfully made a new post')
@@ -47,12 +48,12 @@ router.get('/:id', catchAsync(async(req,res, next)=>{
 }));
 
 //edit post
-router.get('/:id/edit', catchAsync(async(req,res, next)=>{
+router.get('/:id/edit', isLoggedIn, catchAsync(async(req,res, next)=>{
     const post = await BlogPost.findById(req.params.id);
     res.render('posts/edit', { post });
 }));
 
-router.put('/:id', validateBlogPost, catchAsync(async(req,res, next) => {
+router.put('/:id', isLoggedIn, validateBlogPost, catchAsync(async(req,res, next) => {
     const { id } = req.params;
     const post = await BlogPost.findByIdAndUpdate(id, { ...req.body.post });
     req.flash('success', 'Successfully update a post')
@@ -60,12 +61,12 @@ router.put('/:id', validateBlogPost, catchAsync(async(req,res, next) => {
 }));
 
 //delete post
-router.get('/:id/delete', catchAsync(async(req,res, next)=>{
+router.get('/:id/delete', isLoggedIn, catchAsync(async(req,res, next)=>{
     const post = await BlogPost.findById(req.params.id);
     res.render('posts/delete', { post });
 }));
 
-router.delete('/:id', catchAsync(async(req,res, next) => {
+router.delete('/:id', isLoggedIn, catchAsync(async(req,res, next) => {
     const { id } = req.params;
     await BlogPost.findByIdAndDelete(id);
     req.flash('success', 'Successfully delete a post')
