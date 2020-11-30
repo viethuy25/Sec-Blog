@@ -28,16 +28,21 @@ router.get('/create',(req,res) => {
     res.render('posts/create');
 });
 
-//public new post
+//publish new post
 router.post('/', validateBlogPost, catchAsync(async(req,res ,next)=>{
     const post = new BlogPost(req.body.post);
     await post.save();
+    req.flash('success', 'Successfully made a new post')
     res.redirect('/Posts')
 }));
 
 //view specific post page
 router.get('/:id', catchAsync(async(req,res, next)=>{
     const post = await BlogPost.findById(req.params.id);
+    if (!post) {
+        req.flash('error', 'Post not found');
+        return res.redirect('/Posts');
+    }
     res.render('posts/show', { post });
 }));
 
@@ -50,7 +55,7 @@ router.get('/:id/edit', catchAsync(async(req,res, next)=>{
 router.put('/:id', validateBlogPost, catchAsync(async(req,res, next) => {
     const { id } = req.params;
     const post = await BlogPost.findByIdAndUpdate(id, { ...req.body.post });
-    console.log(post._id);
+    req.flash('success', 'Successfully update a post')
     res.redirect('/Posts')
 }));
 
@@ -63,6 +68,7 @@ router.get('/:id/delete', catchAsync(async(req,res, next)=>{
 router.delete('/:id', catchAsync(async(req,res, next) => {
     const { id } = req.params;
     await BlogPost.findByIdAndDelete(id);
+    req.flash('success', 'Successfully delete a post')
     res.redirect('/Posts');
 }));
 

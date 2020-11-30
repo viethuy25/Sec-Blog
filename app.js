@@ -8,8 +8,12 @@ const flash = require('connect-flash');
 const ExpressError = require('./utils/ExpressError');
 const methodOverride = require('method-override');
 const e = require('express');
+const passport = require('passport');
+const LocalStrategy = require('passport-local');
+const User = require('./models/user')
 
-const blogpost = require('./routes/blogpost');
+const userRoute = require('./routes/user');
+const blogpostRoute = require('./routes/blogpost');
 
 mongoose.connect('mongodb://localhost:27017/sec_blog', {
     useNewUrlParser: true,
@@ -48,12 +52,21 @@ const sessionConfig = {
 app.use(session(sessionConfig));
 app.use(flash());
 
-app.use((req,res, next) => {
+app.use((req,res,next) => {
     res.locals.success = req.flash('success');
+    res.locals.error = req.flash('error');
     next();
 })
 
-app.use('/Posts', blogpost)
+app.use(passport.initialize());
+app.use(passport.session());
+passport.use(new LocalStrategy(User.authenticate()));
+
+passport.serializeUser(User.serializeUser());
+passport.deserializeUser(User.deserializeUser());
+
+app.use('/', userRoute);
+app.use('/Posts', blogpostRoute)
 
 //home page
 app.get('/',(req,res)=>{
