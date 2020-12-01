@@ -10,7 +10,8 @@ const methodOverride = require('method-override');
 const e = require('express');
 const passport = require('passport');
 const LocalStrategy = require('passport-local');
-const User = require('./models/user')
+const User = require('./models/user');
+const mongoSanitize = require('express-mongo-sanitize');
 
 const userRoute = require('./routes/user');
 const blogpostRoute = require('./routes/blogpost');
@@ -37,14 +38,19 @@ app.set('views', path.join(__dirname, 'views'));
 app.use(express.urlencoded({ extended: true }));
 app.use(methodOverride('_method'));
 app.use(express.static(path.join(__dirname, 'public')));
+app.use(mongoSanitize({
+    replaceWith: '_'
+}));
 
 
 const sessionConfig = {
+    name : 'blog',
     secret: 'thisshouldbebettersecret!',
     resave: false,
     saveUninitialized: true,
     cookie:{
         httpOnly: true,
+        //secure: true,
         expires: Date.now() + 1000 * 60 * 60 *24 *7,
         age: 1000 * 60 * 60 *24 *7
     }
@@ -74,6 +80,11 @@ app.get('/',(req,res)=>{
     res.render('home');
 });
 
+//edit page
+app.get('/about', (req,res) => {
+    res.render('about');
+});
+
 app.all("*", (req,res,next) => {
     next(new ExpressError ("404, PAGE NOT FOUND", 404));
 });
@@ -81,6 +92,7 @@ app.all("*", (req,res,next) => {
 app.use((err, req, res, next) => {
     const {statusCode = 500} = err;
     if (!err.msg) err.msg="Unknown Error"
+    console.log(err)
     res.status(statusCode).render('error', {err});
 });
 

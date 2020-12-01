@@ -2,22 +2,11 @@
 
 
   <h1>WELCOME TO NEWBIE ZONE</h1>
+  <p class="lead">To be done</p>
   
   <div class="main_container">
-      <div class="card mb-4">
-          <img class="card-img-top" src="https://placeimg.com/750/300/tech" alt="Card image cap">
-          <div class="card-body">
-              <h2 class="card-title"><%= posts.reverse()[0].title %></h2>
-              <p class="card-text"><%= posts[0].description %></p>
-              <a href="/Posts/<%= posts[0]._id %>" class="btn btn-primary">Read More &rarr;</a>
-          </div>
-          <div class="card-footer text-muted">
-              Posted on <%= posts[0]._date %> by <%= posts[0].author %>
-          </div>
-      </div>
-
       <div class="posts">
-        <% for (let post of posts) {%>
+        <% for (let post of posts.reverse()) {%>
           <div class="row justify-content-center">
               <div class="col-lg-7" style="margin-top: 50px;">
                   <div class="card">
@@ -40,4 +29,3 @@
           <% } %>
       </div>
     </div>
-

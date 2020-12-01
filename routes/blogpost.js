@@ -24,6 +24,12 @@ router.get('/', catchAsync(async(req,res)=>{
     res.render('posts/posts', { posts });
 }));
 
+//search page
+router.get('/search', catchAsync(async(req,res) => {
+    const posts = await BlogPost.find({});
+    res.render('posts/search', { posts });
+}));
+
 //new post page
 router.get('/create', isLoggedIn, (req,res) => {
     res.render('posts/create');
