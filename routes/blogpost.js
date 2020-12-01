@@ -25,9 +25,14 @@ router.get('/', catchAsync(async(req,res)=>{
 }));
 
 //search page
-router.get('/search', catchAsync(async(req,res) => {
-    const posts = await BlogPost.find({});
-    res.render('posts/search', { posts });
+router.post('/search', catchAsync(async(req,res) => {
+    const keyword = req.body.keyword;
+    const posts = await BlogPost.find({
+        $text: {
+            $search: keyword
+        }
+    });
+    res.render('posts/search', { posts , keyword});
 }));
 
 //new post page
