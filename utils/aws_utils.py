@@ -1,19 +1,15 @@
 import sys
 import pandas as pd
 import json
+import boto3
+import matplotlib.pyplot as plt
+import matplotlib.image as mpimg
+from io import BytesIO
 
-print ("Hello form Python")
+print ("Hello form Python aws_utils")
 
-print('First param:'+sys.argv[1]+'#')
-print('Second param:'+sys.argv[2]+'#')
-
-def read_user(user):
-    with open(user,) as f:
-        data = json.load(f)
-
-    # Output: {'key_id': , "secret_key" : , "region_name" : }
-    print(data)
-    return data
+#print('First param:'+sys.argv[1]+'#')
+#print('Second param:'+sys.argv[2]+'#')
 
 def s3_conn(key_id, secret_key, regional_name):
     # get a handle on s3
@@ -26,5 +22,25 @@ def s3_conn(key_id, secret_key, regional_name):
 
     return s3
 
-data = read_user('../data/cre.json')
-s3 = aws_utils.s3_conn(data['key_id'], data['secret_key'], data['region_name'])
+def upload_pic(s3, bucket_name, file_name):
+    # get a handle on the bucket that holds your file
+    bucket = s3.Bucket(bucket_name) # example: energy_market_procesing
+    
+    print(bucket)
+    
+    #upload files to S3 bucket
+    bucket.upload_file(file_name, Key='Iris.csv')
+    
+def read_pic (s3,bucket_name, file_name):    
+    # Get image from S3 bucket
+    bucket = s3.Bucket(bucket_name)
+    obj = bucket.Object(file_name)
+    print (obj)
+    
+    file_stream = obj.get()['Body']
+    
+    img = mpimg.imread(BytesIO(file_stream.read()))
+    # imgplot = plt.imshow(img)
+    # plt.show(imgplot)
+
+    return img

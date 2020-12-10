@@ -80,15 +80,22 @@ app.use('/Posts', blogpostRoute)
 app.get('/',(req,res)=>{
     var dataToSend;
     // spawn new child process to call the python script
-    const python = spawn('python', ['./utils/aws_utils.py', 'node.js','python' ]);
+    const python = spawn('python', ['./utils/blog_utils.py', 'Capture.PNG' ]);
     // collect data from script
     python.stdout.on('data', function (data) {
         console.log('Pipe data from python script ...');
+        console.log(data);
         dataToSend = data.toString();
     });
+    //debugging
+    python.stderr.on('data', (data) => {
+        console.log(`error:${data}`);
+     });
+
     // in close event we are sure that stream from child process is closed
     python.on('close', (code) => {
         console.log(`child process close all stdio with code ${code}`);
+        console.log(dataToSend);
         // send data to browser
         res.render('home', { dataToSend })
     });
