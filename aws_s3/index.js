@@ -14,16 +14,26 @@ const s3 = new aws.S3()
 const upload = multer({
     storage: multerS3({
         s3: s3,
-        bucket: 'some-bucket',
-        key: function (req, file, cb) {
-            if(file.mimetype === "image/jpg"  || 
-            file.mimetype ==="image/jpeg"  || 
-            file.mimetype ===  "image/png"){
-                cb(null, true);
-            } else {
-                cb(new Error("Image uploaded is not of type jpg/jpeg or png"),false);
-            }
-    }})
+        bucket: 'new-test-1',
+        metadata: function (req, file, cb) {
+            console.log('Here');
+            cb(null, {fieldName: file.fieldname});
+          },
+          key: function (req, file, cb) {
+            console.log('Here 2');
+            cb(null, Date.now().toString())
+          }
+    }),
+    fileFilter: function (req, file, cb) {
+        console.log(file.mimetype);
+        if(file.mimetype === "image/jpg"  || 
+        file.mimetype ==="image/jpeg"  || 
+        file.mimetype ===  "image/png"){
+            cb(null, true);
+        } else {
+            cb(new Error("Image uploaded is not of type jpg/jpeg or png"),false);
+        }
+    }
 });
 
 module.exports = {

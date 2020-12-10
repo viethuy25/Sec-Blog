@@ -9,7 +9,9 @@ const BlogPost = require('../models/blogpost');
 const e = require('express');
 
 const multer = require('multer');
-const upload = multer({ dest: 'uploads/' })
+const { upload } = require('../aws_s3');
+const uploading = multer({ upload });
+const path = require('path');
 
 const validateBlogPost = (req, res, next) => {
     const { error } = BlogPostSchemaJoi.validate(req.body);
@@ -44,12 +46,24 @@ router.get('/create', isLoggedIn, (req,res) => {
 });
 
 //publish new post
-router.post('/', isLoggedIn, validateBlogPost, upload.single('image'), catchAsync(async(req,res ,next)=>{
-    const post = new BlogPost(req.body, req.file);
-    await post.save();
-    req.flash('success', 'Successfully made a new post')
-    res.redirect('/Posts')
-}));
+// router.post('/', isLoggedIn, validateBlogPost, uploading.single('image'), catchAsync(async(req,res ,next)=>{
+//     const post = new BlogPost(req.body, req.file);
+//     await post.save();
+//     req.flash('success', 'Successfully made a new post')
+//     res.redirect('/Posts')
+// }));
+router.route('/').post(uploading.single('image'), (req, res, cb)=> {
+    console.log(req.body, req.file);
+    if(path.extname(req.file.originalname).toLowerCase() == '.jpg' ||
+    (path.extname(req.file.originalname).toLowerCase() == '.png') ||
+    (path.extname(req.file.originalname).toLowerCase() == '.jpeg')) {
+        res.send("It work")
+        console.log('Success');
+    } else {
+        console.log('False');
+        res.send("Wrong file type");
+    }
+})
 
 //view specific post page
 router.get('/:id', catchAsync(async(req,res, next)=>{
