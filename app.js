@@ -1,3 +1,8 @@
+if (process.env.NODE_ENV !== "production") {
+    require('dotenv').config();
+}
+console.log(process.env)
+
 const express = require('express');
 const path = require('path');
 const mongoose = require('mongoose');
@@ -8,6 +13,7 @@ const flash = require('connect-flash');
 const ExpressError = require('./utils/ExpressError');
 const methodOverride = require('method-override');
 const {spawn} = require('child_process');
+const helper = require('./utils/help')
 
 const passport = require('passport');
 const LocalStrategy = require('passport-local');
@@ -84,8 +90,8 @@ app.get('/',(req,res)=>{
     // collect data from script
     python.stdout.on('data', function (data) {
         console.log('Pipe data from python script ...');
-        console.log(data);
-        dataToSend = data.toString();
+        console.log(helper.encode(data));
+        dataToSend = helper.encode(data);
     });
     //debugging
     python.stderr.on('data', (data) => {

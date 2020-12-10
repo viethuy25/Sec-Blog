@@ -8,6 +8,9 @@ const ExpressError = require('../utils/ExpressError');
 const BlogPost = require('../models/blogpost');
 const e = require('express');
 
+const multer = require('multer');
+const upload = multer({ dest: 'uploads/' })
+
 const validateBlogPost = (req, res, next) => {
     const { error } = BlogPostSchemaJoi.validate(req.body);
     if(error) {
@@ -41,8 +44,8 @@ router.get('/create', isLoggedIn, (req,res) => {
 });
 
 //publish new post
-router.post('/', isLoggedIn, validateBlogPost, catchAsync(async(req,res ,next)=>{
-    const post = new BlogPost(req.body.post);
+router.post('/', isLoggedIn, validateBlogPost, upload.single('image'), catchAsync(async(req,res ,next)=>{
+    const post = new BlogPost(req.body, req.file);
     await post.save();
     req.flash('success', 'Successfully made a new post')
     res.redirect('/Posts')
