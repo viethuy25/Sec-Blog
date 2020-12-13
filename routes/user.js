@@ -3,41 +3,19 @@ const passport = require('passport');
 const router = express.Router();
 const User = require('../models/user');
 const catchAsync = require('../utils/catchAsync');
+const UserController = require('../controllers/user')
 
 //register user
-router.get('/register', (req, res) => {
-    res.render('user/register');
-});
-
-router.post('/register', catchAsync(async(req,res) => {
-    try {
-        const {email, username, password} = req.body;
-        const user = new User({ email, username});
-        const registeredUser = await User.register(user, password);
-        req.flash('success', 'Welcome to my blog');
-        res.redirect('/Posts')
-    } catch(e) {
-        req.flash('error', 'Username or email is taken, please choose another');
-        res.redirect('register');
-    }
-    console.log(registeredUser);
-}));
+router.route('/register')
+    .get(UserController.renderRegister)
+    .post(catchAsync(UserController.registerUser));
 
 //login user
-router.get('/login', (req, res) => {
-    res.render('user/login')
-});
-
-router.post('/login', passport.authenticate('local', {failureFlash: true, failureRedirect: '/login '}), (req,res) => {
-    req.flash('success', 'Welcome back');
-    res.redirect('/Posts')
-});
+router.route('/login')
+    .get(UserController.renderLogin)
+    .post(passport.authenticate('local', {failureFlash: true, failureRedirect: '/login '}), UserController.login);
 
 //logout user
-router.get('/logout', (req, res) => {
-    req.logout();
-    req.flash('success', 'Goodbye');
-    res.redirect('/');
-});
+router.get('/logout', UserController.logout);
 
 module.exports = router;

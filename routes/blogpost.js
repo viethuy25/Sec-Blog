@@ -9,9 +9,43 @@ const BlogPost = require('../models/blogpost');
 const e = require('express');
 
 const multer = require('multer');
-const { upload } = require('../aws_s3');
-const uploading = multer({ upload });
-const path = require('path');
+const aws = require('aws-sdk');
+const multerS3 = require('multer-s3');
+
+const BlogPostController = require('../controllers/route')
+
+aws.config.update({
+    "accessKeyId":  process.env.Access_ID,
+    "secretAccessKey": process.env.Secret,
+    "region" : process.env.Region_name
+})
+
+const s3 = new aws.S3()
+
+const upload = multer({
+    storage: multerS3({
+        s3: s3,
+        bucket: 'new-test-1',
+        metadata: function (req, file, cb) {
+            console.log('Here');
+            cb(null, {fieldName: file.fieldname});
+          },
+          key: function (req, file, cb) {
+            console.log('Here 2');
+            cb(null, Date.now().toString())
+          }
+    }),
+    fileFilter: function (req, file, cb) {
+        console.log(file.mimetype);
+        if(file.mimetype === "image/jpg"  || 
+        file.mimetype ==="image/jpeg"  || 
+        file.mimetype ===  "image/png"){
+            cb(null, true);
+        } else {
+            cb(new Error("Image uploaded is not of type jpg/jpeg or png"),false);
+        }
+    }
+});
 
 const validateBlogPost = (req, res, next) => {
     const { error } = BlogPostSchemaJoi.validate(req.body);
@@ -23,82 +57,25 @@ const validateBlogPost = (req, res, next) => {
     }
 }
 
-//view all posts
-router.get('/', catchAsync(async(req,res)=>{
-    const posts = await BlogPost.find({});
-    res.render('posts/posts', { posts });
-}));
-
+router.route('/')
+    .get(catchAsync(BlogPostController.index)) //view all posts
+    .post(upload.single('image'), catchAsync(BlogPostController.createNewPost)); //publish new post
+//isLoggedIn, validateBlogPost
 //search page
-router.post('/search', catchAsync(async(req,res) => {
-    const keyword = req.body.keyword;
-    const posts = await BlogPost.find({
-        $text: {
-            $search: keyword
-        }
-    });
-    res.render('posts/search', { posts , keyword});
-}));
+router.post('/search', catchAsync(BlogPostController.searchPost));
 
 //new post page
-router.get('/create', isLoggedIn, (req,res) => {
-    res.render('posts/create');
-});
+router.get('/create', isLoggedIn, BlogPostController.renderNewForm);
 
-//publish new post
-// router.post('/', isLoggedIn, validateBlogPost, uploading.single('image'), catchAsync(async(req,res ,next)=>{
-//     const post = new BlogPost(req.body, req.file);
-//     await post.save();
-//     req.flash('success', 'Successfully made a new post')
-//     res.redirect('/Posts')
-// }));
-router.route('/').post(uploading.single('image'), (req, res, cb)=> {
-    console.log(req.body, req.file);
-    if(path.extname(req.file.originalname).toLowerCase() == '.jpg' ||
-    (path.extname(req.file.originalname).toLowerCase() == '.png') ||
-    (path.extname(req.file.originalname).toLowerCase() == '.jpeg')) {
-        res.send("It work")
-        console.log('Success');
-    } else {
-        console.log('False');
-        res.send("Wrong file type");
-    }
-})
-
-//view specific post page
-router.get('/:id', catchAsync(async(req,res, next)=>{
-    const post = await BlogPost.findById(req.params.id);
-    if (!post) {
-        req.flash('error', 'Post not found');
-        return res.redirect('/Posts');
-    }
-    res.render('posts/show', { post });
-}));
+router.route('/:id')
+    .get(catchAsync(BlogPostController.showPost)) //view specific post page
+    .put(isLoggedIn, validateBlogPost, catchAsync(BlogPostController.editPost)) //edit a post
+    .delete(isLoggedIn, catchAsync(BlogPostController.deletePost)); //delete post
 
 //edit post
-router.get('/:id/edit', isLoggedIn, catchAsync(async(req,res, next)=>{
-    const post = await BlogPost.findById(req.params.id);
-    res.render('posts/edit', { post });
-}));
-
-router.put('/:id', isLoggedIn, validateBlogPost, catchAsync(async(req,res, next) => {
-    const { id } = req.params;
-    const post = await BlogPost.findByIdAndUpdate(id, { ...req.body.post });
-    req.flash('success', 'Successfully update a post')
-    res.redirect('/Posts')
-}));
+router.get('/:id/edit', isLoggedIn, catchAsync(BlogPostController.renderEditPost));
 
 //delete post
-router.get('/:id/delete', isLoggedIn, catchAsync(async(req,res, next)=>{
-    const post = await BlogPost.findById(req.params.id);
-    res.render('posts/delete', { post });
-}));
-
-router.delete('/:id', isLoggedIn, catchAsync(async(req,res, next) => {
-    const { id } = req.params;
-    await BlogPost.findByIdAndDelete(id);
-    req.flash('success', 'Successfully delete a post')
-    res.redirect('/Posts');
-}));
+router.get('/:id/delete', isLoggedIn, catchAsync(BlogPostController.renderDeletePost));
 
 module.exports= router;
