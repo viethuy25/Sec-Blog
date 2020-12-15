@@ -5,8 +5,9 @@ import boto3
 import matplotlib.pyplot as plt
 import matplotlib.image as mpimg
 from io import BytesIO
+import base64
 
-print ("Hello form Python aws_utils")
+#print ("Hello form Python aws_utils")
 
 #print('First param:'+sys.argv[1]+'#')
 #print('Second param:'+sys.argv[2]+'#')
@@ -35,12 +36,12 @@ def read_pic (s3,bucket_name, file_name):
     # Get image from S3 bucket
     bucket = s3.Bucket(bucket_name)
     obj = bucket.Object(file_name)
-    print (obj)
     
     file_stream = obj.get()['Body']
-    
+    print (file_stream.read())
     img = mpimg.imread(BytesIO(file_stream.read()))
-    # imgplot = plt.imshow(img)
-    # plt.show(imgplot)
+    #print (base64.b64encode(img))
+    #imgplot = plt.imshow(img)
+    #plt.show(imgplot)
 
-    return img
+    return file_stream.read()

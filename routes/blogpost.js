@@ -26,6 +26,7 @@ const upload = multer({
     storage: multerS3({
         s3: s3,
         bucket: 'new-test-1',
+        acl: 'public-read',
         metadata: function (req, file, cb) {
             console.log('Here');
             cb(null, {fieldName: file.fieldname});
@@ -59,7 +60,7 @@ const validateBlogPost = (req, res, next) => {
 
 router.route('/')
     .get(catchAsync(BlogPostController.index)) //view all posts
-    .post(upload.single('image'), catchAsync(BlogPostController.createNewPost)); //publish new post
+    .post(isLoggedIn, upload.single('image'), validateBlogPost, catchAsync(BlogPostController.createNewPost)); //publish new post
 //isLoggedIn, validateBlogPost
 //search page
 router.post('/search', catchAsync(BlogPostController.searchPost));
@@ -69,7 +70,7 @@ router.get('/create', isLoggedIn, BlogPostController.renderNewForm);
 
 router.route('/:id')
     .get(catchAsync(BlogPostController.showPost)) //view specific post page
-    .put(isLoggedIn, validateBlogPost, catchAsync(BlogPostController.editPost)) //edit a post
+    .put(isLoggedIn, upload.single('image'), validateBlogPost, catchAsync(BlogPostController.editPost)) //edit a post
     .delete(isLoggedIn, catchAsync(BlogPostController.deletePost)); //delete post
 
 //edit post

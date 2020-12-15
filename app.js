@@ -11,8 +11,8 @@ const flash = require('connect-flash');
 
 const ExpressError = require('./utils/ExpressError');
 const methodOverride = require('method-override');
-const {spawn} = require('child_process');
-const helper = require('./utils/help')
+// const {spawn} = require('child_process');
+// const helper = require('./utils/help')
 
 const passport = require('passport');
 const LocalStrategy = require('passport-local');
@@ -83,27 +83,28 @@ app.use('/Posts', blogpostRoute)
 
 //home page
 app.get('/',(req,res)=>{
-    var dataToSend;
-    // spawn new child process to call the python script
-    const python = spawn('python', ['./utils/blog_utils.py', 'Capture.PNG' ]);
-    // collect data from script
-    python.stdout.on('data', function (data) {
-        console.log('Pipe data from python script ...');
-        console.log(helper.encode(data));
-        dataToSend = helper.encode(data);
-    });
-    //debugging
-    python.stderr.on('data', (data) => {
-        console.log(`error:${data}`);
-     });
+    // var dataToSend;
+    // // spawn new child process to call the python script
+    // const python = spawn('python', ['./utils/blog_utils.py', '1607983555135' ]);
+    // // collect data from script
+    // python.stdout.on('data', function (data) {
+    //     console.log('Pipe data from python script ...');
+    //     //console.log(helper.encode(data));
+    //     dataToSend = data;
+    // });
+    // //debugging
+    // python.stderr.on('data', (data) => {
+    //     console.log(`error:${data}`);
+    //  });
 
-    // in close event we are sure that stream from child process is closed
-    python.on('close', (code) => {
-        console.log(`child process close all stdio with code ${code}`);
-        console.log(dataToSend);
-        // send data to browser
-        res.render('home', { dataToSend })
-    });
+    // // in close event we are sure that stream from child process is closed
+    // python.on('close', (code) => {
+    //     console.log(`child process close all stdio with code ${code}`);
+    //     //console.log(dataToSend);
+    //     // send data to browser
+    //     res.render('home', { dataToSend })
+    // });
+    res.render('home')
 });
 
 //edit page
