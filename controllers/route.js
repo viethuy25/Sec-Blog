@@ -23,7 +23,6 @@ module.exports.renderNewForm = (req,res) => {
 }
 
 module.exports.createNewPost = async(req,res ,next)=>{
-    console.log(req.body, req.file);
     if(path.extname(req.file.originalname).toLowerCase() == '.jpg' ||
     (path.extname(req.file.originalname).toLowerCase() == '.png') ||
     (path.extname(req.file.originalname).toLowerCase() == '.jpeg')) {
@@ -43,7 +42,6 @@ module.exports.createNewPost = async(req,res ,next)=>{
             }
         ]
     });
-    console.log(post)
     await post.save();
     req.flash('success', 'Successfully made a new post')
     res.redirect('/Posts')
@@ -51,28 +49,20 @@ module.exports.createNewPost = async(req,res ,next)=>{
 
 //show post
 module.exports.showPost = async(req,res, next)=>{
-    var params = { Bucket: 'new-test-1', Key: '1607983555135' };
     const post = await BlogPost.findById(req.params.id);
     if (!post) {
             req.flash('error', 'Post not found');
             return res.redirect('/Posts');
         }
+
+    const params = { Bucket: 'new-test-1', Key: post.image[0].filename };
     s3.getObject(params, function(err, data) {
         if (err) {
             return res.send({ "error": err });
         }
         dataToSend = help.encode(data.Body);
-        console.log(data);
         res.render('posts/show',{ post, dataToSend });
     });
-      
-    // const post = await BlogPost.findById(req.params.id);
-    // console.log(post);
-    // if (!post) {
-    //     req.flash('error', 'Post not found');
-    //     return res.redirect('/Posts');
-    // }
-    // res.render('posts/show', { post });
 }
 
 //edit post
@@ -94,7 +84,6 @@ module.exports.editPost = async(req,res, next) => {
             }
         ]
      });
-    console.log(post)
     req.flash('success', 'Successfully update a post')
     res.redirect('/Posts')
 }
@@ -107,6 +96,20 @@ module.exports.renderDeletePost = async(req,res, next)=>{
 
 module.exports.deletePost = async(req,res, next) => {
     const { id } = req.params;
+    const post = await BlogPost.findById(req.params.id);
+    if (!post) {
+            req.flash('error', 'Post not found');
+            return res.redirect('/Posts');
+        }
+    const img_key = post.image[0].filename;
+
+    const params = {  Bucket: 'new-test-1', Key: img_key };
+
+    s3.deleteObject(params, function(err, data) {
+        if (err) console.log(err, err.stack);  // error
+        else     console.log();                 // deleted
+    });
+
     await BlogPost.findByIdAndDelete(id);
     req.flash('success', 'Successfully delete a post')
     res.redirect('/Posts');
