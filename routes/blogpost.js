@@ -28,16 +28,13 @@ const upload = multer({
         bucket: 'new-test-1',
         acl: 'public-read',
         metadata: function (req, file, cb) {
-            console.log('Here');
             cb(null, {fieldName: file.fieldname});
           },
           key: function (req, file, cb) {
-            console.log('Here 2');
             cb(null, Date.now().toString())
           }
     }),
     fileFilter: function (req, file, cb) {
-        console.log(file.mimetype);
         if(file.mimetype === "image/jpg"  || 
         file.mimetype ==="image/jpeg"  || 
         file.mimetype ===  "image/png"){

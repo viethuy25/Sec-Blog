@@ -35,3 +35,13 @@ module.exports.logout = (req, res) => {
     req.flash('success', 'Goodbye');
     res.redirect('/');
 }
+
+//change info
+module.exports.renderInfo = async(req,res, next) => {
+    const user = await User.findById(req.user.id);
+    if (!user) {
+        req.flash('error', 'User not found');
+        return res.redirect('/');
+    }
+    res.render('user/info', { user })
+}

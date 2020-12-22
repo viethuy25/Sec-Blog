@@ -2,12 +2,14 @@
 
 
   <h1>WELCOME TO NEWBIE ZONE</h1>
+  <% if (posts.length > 0) { %>
   <div class="main_container">
       <div class="card mb-4">
           <img class="card-img-top" src="https://placeimg.com/750/300/tech" alt="Card image cap">
           <div class="card-body">
               <h2 class="card-title"><%= posts.reverse()[0].title %></h2>
-              <p class="card-text"><%= posts[0].description %></p>
+              <% temp_big = posts[0].description.substr(0,200).replace("\\n", "") %>
+              <p class="card-text"><%= temp_big %>...</p>
               <a href="/Posts/<%= posts[0]._id %>" class="btn btn-primary">Read More &rarr;</a>
           </div>
           <div class="card-footer text-muted">
@@ -15,7 +17,7 @@
           </div>
       </div>
 
-      <div class="posts">
+      <div class="posts"> 
         <% for (let post of posts) {%>
           <div class="row justify-content-center">
               <div class="col-lg-7" style="margin-top: 50px;">
@@ -29,7 +31,8 @@
                           <p class="card-text">
                             <small class="text-muted"><%= post.date %></small>
                           </p>
-                          <p class="card-text"><%= post.description %></p>
+                          <% temp = post.description.substr(0,50).replace("\\n", "") %>
+                          <p class="card-text"><%= temp %>...</p>
                           <a href="/Posts/<%= post._id %>" class="btn btn-primary">Read More &rarr;</a>
                       </div>
                   </div>
@@ -37,5 +40,9 @@
           </div>
           <% } %>
       </div>
+      <% } else {%>
+        <h3 class="lead">Let's make our first post</h3>
+    <% } %>
+
     </div>
 

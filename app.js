@@ -21,8 +21,11 @@ const mongoSanitize = require('express-mongo-sanitize');
 
 const userRoute = require('./routes/user');
 const blogpostRoute = require('./routes/blogpost');
-
-mongoose.connect('mongodb://localhost:27017/sec_blog', {
+const { MongoStore } = require('connect-mongo');
+const dbURL = 'mongodb://localhost:27017/sec_blog';
+const MongoDBStore = require("connect-mongo")(session);
+//process.env.DB_URL ||
+mongoose.connect(dbURL, {
     useNewUrlParser: true,
     useCreateIndex: true,
     useUnifiedTopology: true,
@@ -48,10 +51,20 @@ app.use(mongoSanitize({
     replaceWith: '_'
 }));
 
+const secret = process.env.SECRET || 'thisshouldbebettersecret!';
+const store = new MongoDBStore({
+    url: dbURL,
+    secret,
+    touchAfter: 24*3600
+});
 
+store.on("error", function (e) {
+    console.log("Session store error: ", e)
+})
 const sessionConfig = {
+    store,
     name : 'blog',
-    secret: 'thisshouldbebettersecret!',
+    secret,
     resave: false,
     saveUninitialized: true,
     cookie:{
