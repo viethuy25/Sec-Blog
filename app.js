@@ -22,7 +22,7 @@ const mongoSanitize = require('express-mongo-sanitize');
 const userRoute = require('./routes/user');
 const blogpostRoute = require('./routes/blogpost');
 const { MongoStore } = require('connect-mongo');
-const dbURL = 'mongodb://localhost:27017/sec_blog';
+const dbURL = process.env.DB_URL || 'mongodb://localhost:27017/sec_blog';
 const MongoDBStore = require("connect-mongo")(session);
 //process.env.DB_URL ||
 mongoose.connect(dbURL, {
