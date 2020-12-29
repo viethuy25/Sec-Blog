@@ -117,11 +117,18 @@ module.exports.deletePost = async(req,res, next) => {
 
 //search post
 module.exports.searchPost = async(req,res) => {
-    const keyword = req.body.keyword;
-    const posts = await BlogPost.find({
-        $text: {
-            $search: keyword
-        }
-    });
+    let keyword = req.body.keyword;
+    if (!keyword)
+        keyword = 'empty'
+
+    const posts = await BlogPost.aggregate([{
+        $search: {
+            text: {
+              query: keyword,
+              path: ['description','title']
+            }
+          }
+          //{$search: keyword}
+    }]);
     res.render('posts/search', { posts , keyword});
 }
